@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) 2013. AgileApes (http://www.agileapes.scom/), and
+ * associated organizations.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ */
+
+package com.agileapes.webexport.io.impl;
+
+import com.agileapes.webexport.io.OutputManager;
+import com.agileapes.webexport.io.impl.address.FileAddress;
+import com.agileapes.webexport.io.impl.content.ReaderContent;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+/**
+ * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
+ * @since 1.0 (2013/2/13, 21:05)
+ */
+public final class FileOutputManager implements OutputManager<FileAddress, ReaderContent> {
+
+    @Override
+    public void commit(FileAddress address, ReaderContent content) throws IOException {
+        final FileWriter writer = new FileWriter(address.getFile());
+        int data;
+        while ((data = content.read()) != -1) {
+            writer.write(data);
+        }
+        writer.close();
+        content.close();
+    }
+
+}
