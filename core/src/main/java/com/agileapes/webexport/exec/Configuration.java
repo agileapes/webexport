@@ -60,4 +60,9 @@ public interface Configuration {
      */
     Set<String> getStartStates();
 
+    /**
+     * @return the user agent the current crawl
+     */
+    String getUserAgent();
+
 }

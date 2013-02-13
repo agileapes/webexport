@@ -20,6 +20,9 @@ import java.io.Writer;
 import java.net.URLConnection;
 
 /**
+ * This interface is designed to encapsulate the process of connecting to a remote host and then
+ * downloading the content of the designated URL
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/13, 22:42)
  */

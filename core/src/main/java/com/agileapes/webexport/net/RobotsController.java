@@ -15,20 +15,17 @@
 
 package com.agileapes.webexport.net;
 
-import java.net.Proxy;
+import java.net.URL;
 
 /**
- * This descriptor will describe an indirect connection
+ * This interface is designed to be able to answer the question that whether a given user-agent
+ * is allowed to access a certain path or not?
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/13, 22:34)
+ * @since 1.0 (2013/2/13, 23:55)
  */
-public interface ProxyDescriptor {
+public interface RobotsController {
 
-    Proxy.Type getType();
-
-    String getHost();
-
-    Integer getPort();
+    boolean canAccess(String agent, URL path);
 
 }

@@ -19,9 +19,10 @@ import com.agileapes.webexport.net.ProxyDescriptor;
 
 import java.net.Proxy;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
+ * This is an immutable proxy descriptor
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/13, 22:36)
  */

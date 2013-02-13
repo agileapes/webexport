@@ -17,6 +17,7 @@ package com.agileapes.webexport.net.impl;
 
 import com.agileapes.webexport.net.PageDownloader;
 import com.agileapes.webexport.net.ProxyDescriptor;
+import com.agileapes.webexport.net.RobotsController;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,48 +26,54 @@ import java.io.Writer;
 import java.net.*;
 
 /**
+ * This is the default implementation of the page downloader
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/13, 22:43)
  */
 public class DefaultPageDownloader implements PageDownloader {
 
+    public static final String DEFAULT_USER_AGENT = "AgileApes WebExport/1.0";
+    private static final String ROBOTS_TXT = "/robots.txt";
     private final Proxy proxy;
     private final URL url;
     private URLConnection connection;
     private boolean connected;
-    private final String userAgent;
+    private String userAgent = DEFAULT_USER_AGENT;
+    private final RobotsController controller;
 
-    public DefaultPageDownloader(String url) throws MalformedURLException {
-        this(url, (String) null);
+    public DefaultPageDownloader(RobotsController controller, String url) throws MalformedURLException {
+        this(controller, url, (String) null);
     }
 
-    public DefaultPageDownloader(URL url) {
-        this(url, (String) null);
+    public DefaultPageDownloader(RobotsController controller, URL url) {
+        this(controller, url, (String) null);
     }
 
-    public DefaultPageDownloader(String url, String userAgent) throws MalformedURLException {
-        this(new URL(url), userAgent);
+    public DefaultPageDownloader(RobotsController controller, String url, String userAgent) throws MalformedURLException {
+        this(controller, new URL(url), userAgent);
     }
 
-    public DefaultPageDownloader(URL url, String userAgent) {
-        this(url, null, userAgent);
+    public DefaultPageDownloader(RobotsController controller, URL url, String userAgent) {
+        this(controller, url, null, userAgent);
     }
 
-    public DefaultPageDownloader(String url, ProxyDescriptor proxyDescriptor) throws MalformedURLException {
-        this(url, proxyDescriptor, null);
+    public DefaultPageDownloader(RobotsController controller, String url, ProxyDescriptor proxyDescriptor) throws MalformedURLException {
+        this(controller, url, proxyDescriptor, null);
     }
 
-    public DefaultPageDownloader(String url, ProxyDescriptor proxyDescriptor, String userAgent) throws MalformedURLException {
-        this(new URL(url), proxyDescriptor, userAgent);
+    public DefaultPageDownloader(RobotsController controller, String url, ProxyDescriptor proxyDescriptor, String userAgent) throws MalformedURLException {
+        this(controller, new URL(url), proxyDescriptor, userAgent);
     }
 
-    public DefaultPageDownloader(URL url, ProxyDescriptor proxyDescriptor) {
-        this(url, proxyDescriptor, null);
+    public DefaultPageDownloader(RobotsController controller, URL url, ProxyDescriptor proxyDescriptor) {
+        this(controller, url, proxyDescriptor, null);
     }
 
-    public DefaultPageDownloader(URL url, ProxyDescriptor proxyDescriptor, String userAgent) {
+    public DefaultPageDownloader(RobotsController controller, URL url, ProxyDescriptor proxyDescriptor, String userAgent) {
+        this.controller = controller;
         this.url = url;
-        this.userAgent = userAgent;
+        this.userAgent = userAgent == null ? DEFAULT_USER_AGENT : userAgent;
         if (proxyDescriptor == null) {
             proxy = Proxy.NO_PROXY;
         } else {
@@ -119,6 +126,9 @@ public class DefaultPageDownloader implements PageDownloader {
         if (!connected) {
             throw new IllegalStateException("Downloader is not connected");
         }
+        if (controller != null && !url.getPath().equals(ROBOTS_TXT) && !controller.canAccess(userAgent, url)) {
+            throw new IllegalAccessError("This user agent cannot access the content at " + url.toExternalForm());
+        }
         final InputStream connectionInputStream = connection.getInputStream();
         int data;
         while ((data = connectionInputStream.read()) != -1) {
@@ -132,7 +142,7 @@ public class DefaultPageDownloader implements PageDownloader {
     }
 
     public static void main(String[] args) throws Exception {
-        final DefaultPageDownloader downloader = new DefaultPageDownloader("http://en.wikipedia.org/robots.txt", new ImmutableProxyDescriptor(Proxy.Type.SOCKS, "127.0.0.1", 32201), "wget");
+        final DefaultPageDownloader downloader = new DefaultPageDownloader(new AutomatedRobotsController(), "http://en.wikipedia.org/wiki/Main_Page", new ImmutableProxyDescriptor(Proxy.Type.SOCKS, "127.0.0.1", 32201), null);
         final StringWriter writer = new StringWriter();
         downloader.connect();
         downloader.download(writer);

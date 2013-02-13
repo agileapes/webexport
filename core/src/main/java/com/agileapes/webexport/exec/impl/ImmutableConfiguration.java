@@ -16,6 +16,7 @@
 package com.agileapes.webexport.exec.impl;
 
 import com.agileapes.webexport.exec.Configuration;
+import com.agileapes.webexport.net.impl.DefaultPageDownloader;
 import com.agileapes.webexport.url.transform.AddressTransformer;
 
 import java.util.Collections;
@@ -90,6 +91,11 @@ public class ImmutableConfiguration implements Configuration {
     @Override
     public Set<String> getStartStates() {
         return Collections.unmodifiableSet(startingStates);
+    }
+
+    @Override
+    public String getUserAgent() {
+        return DefaultPageDownloader.DEFAULT_USER_AGENT;
     }
 
     @Override
