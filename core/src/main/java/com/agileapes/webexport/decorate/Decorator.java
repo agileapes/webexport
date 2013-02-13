@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * This interface denotes the concept of Decorator as described in the white paper.
+ * This class denotes the concept of Decorator as described in the white paper.
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/13, 16:09)
@@ -56,7 +56,7 @@ public abstract class Decorator implements ApplicationListener<CrawlerEvent> {
     }
 
     /**
-     * This method is called when a page has just been parsed by a parser
+     * This method is called when the process of parsing pages is completed
      * @param models    the models representing the outcome of the parser
      */
     public void decorate(Collection<PageModel> models) {

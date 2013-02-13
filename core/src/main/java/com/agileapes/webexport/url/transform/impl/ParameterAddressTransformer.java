@@ -6,6 +6,9 @@ import java.net.MalformedURLException;
 import java.util.regex.Pattern;
 
 /**
+ * This transformer takes in a pattern and removes any GET parameters from the URL whose
+ * names' match the given pattern
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 12:24)
  */

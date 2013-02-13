@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * A PrefetchState is a preview of the state we will be in once we download the content of the page.
+ * That is, this state will result in an {@link ActiveState} once the transition has been made.
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 14:27)
  */
@@ -20,7 +23,7 @@ public class PrefetchState implements State {
     private String domain;
     private String context;
     private final Map<String, String> parameters = new HashMap<String, String>();
-    private String port;
+    private Integer port;
     private String username;
     private String password;
 
@@ -33,7 +36,7 @@ public class PrefetchState implements State {
         this.address = url;
         domain = "";
         context = "";
-        port = "";
+        port = 80;
         username = "";
         password = "";
         int i = 0;
@@ -59,7 +62,7 @@ public class PrefetchState implements State {
             username = username.substring(0, username.indexOf(':'));
         }
         if (domain.contains(":")) {
-            port = domain.substring(domain.indexOf(':') + 1);
+            port = Integer.parseInt(domain.substring(domain.indexOf(':') + 1));
             domain = domain.substring(0, domain.indexOf(':'));
         }
         int start = i;
@@ -111,7 +114,7 @@ public class PrefetchState implements State {
     }
 
     @Override
-    public String getPort() {
+    public Integer getPort() {
         return port;
     }
 

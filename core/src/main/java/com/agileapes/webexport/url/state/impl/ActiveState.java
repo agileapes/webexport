@@ -5,16 +5,18 @@ import com.agileapes.webexport.url.state.State;
 import java.util.Set;
 
 /**
+ * An ActiveState is a state for which the content has been downloaded and is ready to be parsed
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 14:41)
  */
-public class FinalState implements State {
+public class ActiveState implements State {
 
     private final PrefetchState state;
     private final Long timestamp;
     private final String content;
 
-    public FinalState(PrefetchState state, Long timestamp, String content) {
+    public ActiveState(PrefetchState state, Long timestamp, String content) {
         this.state = state;
         this.timestamp = timestamp;
         this.content = content;
@@ -41,7 +43,7 @@ public class FinalState implements State {
     }
 
     @Override
-    public String getPort() {
+    public Integer getPort() {
         return state.getPort();
     }
 
