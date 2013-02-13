@@ -1,15 +1,25 @@
 package com.agileapes.webexport.url.transform.impl;
 
 import com.agileapes.webexport.url.transform.AddressTransformer;
-import org.springframework.core.Ordered;
 
 import java.net.MalformedURLException;
+import java.util.regex.Pattern;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 12:24)
  */
-public class SessionIdTransformer implements AddressTransformer, Ordered {
+public class ParameterAddressTransformer implements AddressTransformer {
+
+    private final Pattern pattern;
+
+    public ParameterAddressTransformer(Pattern pattern) {
+        this.pattern = pattern;
+    }
+
+    public ParameterAddressTransformer(String pattern) {
+        this.pattern = Pattern.compile(pattern, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+    }
 
     @Override
     public String transform(String url) throws MalformedURLException {
@@ -56,7 +66,7 @@ public class SessionIdTransformer implements AddressTransformer, Ordered {
             //assembling it all together
             if (i == url.length() || url.charAt(i + 1) == '&') {
                 //if the variable is a session identifier, we don't append it
-                if (!variable.toLowerCase().matches(".*(session|sessid).*")) {
+                if (!pattern.matcher(variable).matches()) {
                     result += variable;
                     if (hasEquals) {
                         result += '=';
@@ -72,11 +82,6 @@ public class SessionIdTransformer implements AddressTransformer, Ordered {
             }
         }
         return result;
-    }
-
-    @Override
-    public int getOrder() {
-        return HIGHEST_PRECEDENCE;
     }
 
 }
