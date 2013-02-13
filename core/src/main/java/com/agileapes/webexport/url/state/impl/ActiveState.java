@@ -17,6 +17,7 @@ package com.agileapes.webexport.url.state.impl;
 
 import com.agileapes.webexport.url.state.State;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,11 +31,13 @@ public class ActiveState implements State {
     private final PrefetchState state;
     private final Long timestamp;
     private final String content;
+    private final Map<String, String> headers;
 
-    public ActiveState(PrefetchState state, Long timestamp, String content) {
+    public ActiveState(PrefetchState state, Long timestamp, String content, Map<String, String> headers) {
         this.state = state;
         this.timestamp = timestamp;
         this.content = content;
+        this.headers = headers;
     }
 
     @Override
@@ -95,6 +98,16 @@ public class ActiveState implements State {
     @Override
     public Integer getDepth() {
         return state.getDepth();
+    }
+
+    @Override
+    public Set<String> getHeaders() {
+        return headers.keySet();
+    }
+
+    @Override
+    public String getHeader(String header) {
+        return headers.get(header);
     }
 
 }

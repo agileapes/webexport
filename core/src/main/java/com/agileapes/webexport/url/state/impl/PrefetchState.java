@@ -164,6 +164,16 @@ public class PrefetchState implements State {
     }
 
     @Override
+    public Set<String> getHeaders() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getHeader(String header) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Long getTimestamp() {
         throw new UnsupportedOperationException();
     }

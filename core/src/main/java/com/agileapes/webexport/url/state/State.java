@@ -110,4 +110,15 @@ public interface State {
      */
     Integer getDepth();
 
+    /**
+     * @return the names of all the HTTP headers sent through the connection
+     */
+    Set<String> getHeaders();
+
+    /**
+     * @param header    the name of the HTTP header field
+     * @return the value of that field, or {@code null} if no such field was defined
+     */
+    String getHeader(String header);
+
 }
