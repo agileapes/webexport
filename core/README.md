@@ -9,18 +9,18 @@ The Workings
 
 The ecosystem of this framework follows a general routine:
 
-  0. Initiating with the start state
-  1. Discovering transitions from the given state
-  2. Transforming and unifying addresses
-  3. Capturing the state
-  4. Redirecting to parsers
-  5. Storing meta models
-  6. Choosing next states and following with step 1 as a fork
-  7. Decorating meta models and wrapping up in a separate fork
+  1. Initiating with the start state
+  2. Discovering transitions from the given state
+  3. Transforming and unifying addresses
+  4. Capturing the state
+  5. Redirecting to parsers
+  6. Storing meta models
+  7. Choosing next states and following with step 1 as a fork
+  8. Decorating meta models and wrapping up in a separate fork
 
 A detailed explanation of the concepts used in the above listing will follow.
 
-It is useful to note that the asynchronousity suggested in steps 6 and 7 can be overlooked, and the whole process can be
+It is useful to note that the asynchronousity suggested in steps 7 and 8 can be overlooked, and the whole process can be
 implemented as a synchronous application.
 
 To give a short summary of it, the web is looked at as a **Humungous&trade;** state machine, with every node in it capable
@@ -59,6 +59,10 @@ Concepts
 
     *Redirects* are extensions that will tell the application which -- if any -- of the *parsers* should be used for any
     given *transition* at any present *state*.
+
+* **Rules**
+
+    *Rules* are what specify *redirects*.
 
 * **Decorators**
 
