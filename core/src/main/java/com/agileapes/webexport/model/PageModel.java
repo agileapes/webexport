@@ -1,4 +1,4 @@
-package com.agileapes.webexport.url.model;
+package com.agileapes.webexport.model;
 
 import com.agileapes.webexport.url.state.State;
 

@@ -1,6 +1,6 @@
 package com.agileapes.webexport.parse;
 
-import com.agileapes.webexport.url.model.PageModel;
+import com.agileapes.webexport.model.PageModel;
 import com.agileapes.webexport.url.state.State;
 
 /**
