@@ -15,7 +15,7 @@
 
 package com.agileapes.webexport.url.rule;
 
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
  * A rule is a matches that will decide if a triple of {@code <start, origin, state>}
@@ -39,7 +39,7 @@ public interface Rule {
      */
     public static final Rule ALL = new Rule() {
         @Override
-        public boolean matches(State start, State origin, State target) {
+        public boolean matches(UrlState start, UrlState origin, UrlState target) {
             return false;
         }
 
@@ -58,7 +58,7 @@ public interface Rule {
      *                  on the results of this method this transition might or might not be taken.
      * @return {@code true} if the given rule applies to the current situation
      */
-    boolean matches(State start, State origin, State target);
+    boolean matches(UrlState start, UrlState origin, UrlState target);
 
     /**
      * @return the requirements for correct evaluation of this rule

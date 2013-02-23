@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * The state is the centerpiece around which all the action takes place.
- * The "State" encapsulates the concept of a valid move within the web graph.
+ * The "UrlState" encapsulates the concept of a valid move within the web graph.
  * States are considered different if they result in the exact same content. On the other hand,
  * two states with the same {@code <address, timestamp>} pair are considered to be exactly the same,
  * even if their content -- by some chance (e.g., two worker threads hitting the exact same address
@@ -47,7 +47,7 @@ import java.util.Set;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 14:16)
  */
-public interface State {
+public interface UrlState {
 
     /**
      * @return the actual, fully qualified address leading to this state

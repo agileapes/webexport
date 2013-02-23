@@ -13,34 +13,19 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.model;
-
-import com.agileapes.webexport.url.state.UrlState;
+package com.agileapes.webexport.url.state;
 
 /**
- * This interface holds the description of a page as defined by a given parser
+ * The UrlStateContext is the omniscient class in charge of the current state of affairs
+ * regarding the state-machine model of the crawler
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/12, 14:23)
+ * @since 1.0 (2013/2/23, 13:49)
  */
-public interface PageModel {
+public interface UrlStateContext {
 
-    /**
-     * @return the state that has resulted in the creation of the page model
-     */
-    UrlState getState();
+    UrlState next();
 
-    /**
-     * Sets a property of the page model
-     * @param name     the name of the property
-     * @param value    the actual value of the property
-     */
-    void setProperty(String name, Object value);
-
-    /**
-     * @param name    the name of the property
-     * @return the value of the given property
-     */
-    Object getProperty(String name);
+    void add(UrlState state);
 
 }

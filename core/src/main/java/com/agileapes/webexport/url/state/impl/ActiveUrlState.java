@@ -15,25 +15,25 @@
 
 package com.agileapes.webexport.url.state.impl;
 
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 import java.util.Map;
 import java.util.Set;
 
 /**
- * An ActiveState is a state for which the content has been downloaded and is ready to be parsed
+ * An ActiveUrlState is a state for which the content has been downloaded and is ready to be parsed
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 14:41)
  */
-public class ActiveState implements State {
+public class ActiveUrlState implements UrlState {
 
-    private final PrefetchState state;
+    private final PrefetchUrlState state;
     private final Long timestamp;
     private final String content;
     private final Map<String, String> headers;
 
-    public ActiveState(PrefetchState state, Long timestamp, String content, Map<String, String> headers) {
+    public ActiveUrlState(PrefetchUrlState state, Long timestamp, String content, Map<String, String> headers) {
         this.state = state;
         this.timestamp = timestamp;
         this.content = content;

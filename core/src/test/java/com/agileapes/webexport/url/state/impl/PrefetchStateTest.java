@@ -13,17 +13,17 @@ public class PrefetchStateTest {
 
     @Test(expectedExceptions = UnsupportedOperationException.class)
     public void testContent() throws Exception {
-        new PrefetchState("", 0).getContent();
+        new PrefetchUrlState("", 0).getContent();
     }
 
     @Test(expectedExceptions = UnsupportedOperationException.class)
     public void testTimestamp() throws Exception {
-        new PrefetchState("", 0).getTimestamp();
+        new PrefetchUrlState("", 0).getTimestamp();
     }
 
     @Test
     public void testAddressWithoutProtocol() throws Exception {
-        final PrefetchState state = new PrefetchState("google.com", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("google.com", 0);
         Assert.assertEquals(state.getAddress(), "http://google.com");
         Assert.assertEquals(state.getProtocol(), "http");
         Assert.assertEquals(state.getDomain(), "google.com");
@@ -31,7 +31,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithUsername() throws Exception {
-        final PrefetchState state = new PrefetchState("smtp://m.m.naseri@gmail.com", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("smtp://m.m.naseri@gmail.com", 0);
         Assert.assertEquals(state.getProtocol(), "smtp");
         Assert.assertEquals(state.getDomain(), "gmail.com");
         Assert.assertEquals(state.getUsername(), "m.m.naseri");
@@ -39,7 +39,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithUsernameAndPassword() throws Exception {
-        final PrefetchState state = new PrefetchState("smtp://m.m.naseri:somepass@gmail.com", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("smtp://m.m.naseri:somepass@gmail.com", 0);
         Assert.assertEquals(state.getProtocol(), "smtp");
         Assert.assertEquals(state.getDomain(), "gmail.com");
         Assert.assertEquals(state.getUsername(), "m.m.naseri");
@@ -48,7 +48,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithUsernameAndPasswordAndPortNumber() throws Exception {
-        final PrefetchState state = new PrefetchState("smtp://m.m.naseri:somepass@gmail.com:465", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("smtp://m.m.naseri:somepass@gmail.com:465", 0);
         Assert.assertEquals(state.getProtocol(), "smtp");
         Assert.assertEquals(state.getDomain(), "gmail.com");
         Assert.assertEquals(state.getUsername(), "m.m.naseri");
@@ -58,7 +58,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithUsernameAndPasswordAndPortNumberAndNoContextPath() throws Exception {
-        final PrefetchState state = new PrefetchState("smtp://m.m.naseri:somepass@gmail.com:465/?", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("smtp://m.m.naseri:somepass@gmail.com:465/?", 0);
         Assert.assertEquals(state.getProtocol(), "smtp");
         Assert.assertEquals(state.getDomain(), "gmail.com");
         Assert.assertEquals(state.getUsername(), "m.m.naseri");
@@ -69,7 +69,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithUsernameAndPasswordAndPortNumberAndContextPath() throws Exception {
-        final PrefetchState state = new PrefetchState("smtp://m.m.naseri:somepass@gmail.com:465/this/is/a/test", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("smtp://m.m.naseri:somepass@gmail.com:465/this/is/a/test", 0);
         Assert.assertEquals(state.getProtocol(), "smtp");
         Assert.assertEquals(state.getDomain(), "gmail.com");
         Assert.assertEquals(state.getUsername(), "m.m.naseri");
@@ -80,7 +80,7 @@ public class PrefetchStateTest {
 
     @Test
     public void testAddressWithQueryString() throws Exception {
-        final PrefetchState state = new PrefetchState("images.google.com/result?q=123&data=hello&&x", 0);
+        final PrefetchUrlState state = new PrefetchUrlState("images.google.com/result?q=123&data=hello&&x", 0);
         Assert.assertEquals(state.getProtocol(), "http");
         Assert.assertEquals(state.getDomain(), "images.google.com");
         Assert.assertEquals(state.getContext(), "/result");
@@ -96,6 +96,6 @@ public class PrefetchStateTest {
 
     @Test(expectedExceptions = MalformedURLException.class)
     public void testMalformedKeyValue() throws Exception {
-        new PrefetchState("google.com?q=1=2", 0);
+        new PrefetchUrlState("google.com?q=1=2", 0);
     }
 }

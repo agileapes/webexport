@@ -13,34 +13,29 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.model;
-
-import com.agileapes.webexport.url.state.UrlState;
+package com.agileapes.webexport.concurrent;
 
 /**
- * This interface holds the description of a page as defined by a given parser
+ * A manager is a concurrent process handler that is in charge of initializing, starting,
+ * preparing, and populating worker threads and assigning tasks to them and then taking care
+ * of their eventual death.
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/12, 14:23)
+ * @since 1.0 (2013/2/23, 13:33)
  */
-public interface PageModel {
+public interface Manager<R extends Thread> extends Runnable {
 
     /**
-     * @return the state that has resulted in the creation of the page model
+     * This method should be called whenever we expect this manager to shut itself and
+     * all its spawned processes down
      */
-    UrlState getState();
+    void shutdown();
 
     /**
-     * Sets a property of the page model
-     * @param name     the name of the property
-     * @param value    the actual value of the property
+     * This method is called by a worker within its bounds to signify that
+     * the given worker has done its work and can now be assigned new tasks
+     * @param worker    the worker
      */
-    void setProperty(String name, Object value);
-
-    /**
-     * @param name    the name of the property
-     * @return the value of the given property
-     */
-    Object getProperty(String name);
+    void done(R worker);
 
 }

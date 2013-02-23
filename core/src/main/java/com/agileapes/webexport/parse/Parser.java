@@ -16,7 +16,7 @@
 package com.agileapes.webexport.parse;
 
 import com.agileapes.webexport.model.PageModel;
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
  * The Parser is expected to parse the contents of a given page and return a PageModel
@@ -29,7 +29,7 @@ public interface Parser {
 
     public static final Parser NULL = new Parser() {
         @Override
-        public PageModel parse(State state) {
+        public PageModel parse(UrlState state) {
             return null;
         }
     };
@@ -41,9 +41,9 @@ public interface Parser {
      * to the context of the parser/decorator pairs
      * @param state    The state object representing the page and its various aspects.
      *                 As the parser has to work with the contents of the given page, this state
-     *                 has to be a descendant of {@link com.agileapes.webexport.url.state.impl.ActiveState}
+     *                 has to be a descendant of {@link com.agileapes.webexport.url.state.impl.ActiveUrlState}
      * @return the page model representing the current page
      */
-    PageModel parse(State state);
+    PageModel parse(UrlState state);
 
 }

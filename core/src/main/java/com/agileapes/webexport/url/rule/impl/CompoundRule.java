@@ -17,7 +17,7 @@ package com.agileapes.webexport.url.rule.impl;
 
 import com.agileapes.webexport.url.rule.Rule;
 import com.agileapes.webexport.url.rule.RuleRequirement;
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
  * This class encapsulates the concept of compound rules.
@@ -38,7 +38,7 @@ public class CompoundRule implements Rule {
     }
 
     @Override
-    public boolean matches(State start, State origin, State target) {
+    public boolean matches(UrlState start, UrlState origin, UrlState target) {
         return false;
     }
 

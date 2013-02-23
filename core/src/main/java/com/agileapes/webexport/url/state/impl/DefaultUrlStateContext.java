@@ -13,34 +13,34 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.model;
+package com.agileapes.webexport.url.state.impl;
 
 import com.agileapes.webexport.url.state.UrlState;
+import com.agileapes.webexport.url.state.UrlStateContext;
+
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * This interface holds the description of a page as defined by a given parser
- *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/12, 14:23)
+ * @since 1.0 (2013/2/23, 15:27)
  */
-public interface PageModel {
+public class DefaultUrlStateContext implements UrlStateContext {
 
-    /**
-     * @return the state that has resulted in the creation of the page model
-     */
-    UrlState getState();
+    private final Set<UrlState> states = new CopyOnWriteArraySet<UrlState>();
 
-    /**
-     * Sets a property of the page model
-     * @param name     the name of the property
-     * @param value    the actual value of the property
-     */
-    void setProperty(String name, Object value);
+    @Override
+    public synchronized UrlState next() {
+        if (states.isEmpty()) {
+            return null;
+        }
+        final UrlState state = states.iterator().next();
+        states.remove(state);
+        return state;
+    }
 
-    /**
-     * @param name    the name of the property
-     * @return the value of the given property
-     */
-    Object getProperty(String name);
-
+    @Override
+    public void add(UrlState state) {
+        states.add(state);
+    }
 }

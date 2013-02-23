@@ -15,7 +15,7 @@
 
 package com.agileapes.webexport.event;
 
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
  * This event is published before a transition has been made. Of course, this event occurs
@@ -27,8 +27,8 @@ import com.agileapes.webexport.url.state.State;
  */
 public class BeforeParseEvent extends CrawlerEvent {
 
-    private final State origin;
-    private final State target;
+    private final UrlState origin;
+    private final UrlState target;
 
     /**
      * Create a new ApplicationEvent.
@@ -37,17 +37,17 @@ public class BeforeParseEvent extends CrawlerEvent {
      * @param origin the state we are in at this moment
      * @param target the state that is to be assumed after the transition
      */
-    public BeforeParseEvent(Object source, State origin, State target) {
+    public BeforeParseEvent(Object source, UrlState origin, UrlState target) {
         super(source);
         this.origin = origin;
         this.target = target;
     }
 
-    public State getOrigin() {
+    public UrlState getOrigin() {
         return origin;
     }
 
-    public State getTarget() {
+    public UrlState getTarget() {
         return target;
     }
 

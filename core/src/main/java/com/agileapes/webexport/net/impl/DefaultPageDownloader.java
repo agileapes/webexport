@@ -21,7 +21,6 @@ import com.agileapes.webexport.net.RobotsController;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.*;
 
@@ -139,14 +138,6 @@ public class DefaultPageDownloader implements PageDownloader {
     @Override
     public URLConnection getConnection() {
         return connection;
-    }
-
-    public static void main(String[] args) throws Exception {
-        final DefaultPageDownloader downloader = new DefaultPageDownloader(new AutomatedRobotsController(), "http://en.wikipedia.org/wiki/Main_Page", new ImmutableProxyDescriptor(Proxy.Type.SOCKS, "127.0.0.1", 32201), null);
-        final StringWriter writer = new StringWriter();
-        downloader.connect();
-        downloader.download(writer);
-        System.out.println(writer.toString());
     }
 
 }

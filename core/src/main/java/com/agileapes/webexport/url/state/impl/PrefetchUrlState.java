@@ -15,7 +15,7 @@
 
 package com.agileapes.webexport.url.state.impl;
 
-import com.agileapes.webexport.url.state.State;
+import com.agileapes.webexport.url.state.UrlState;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A PrefetchState is a preview of the state we will be in once we download the content of the page.
- * That is, this state will result in an {@link ActiveState} once the transition has been made.
+ * A PrefetchUrlState is a preview of the state we will be in once we download the content of the page.
+ * That is, this state will result in an {@link ActiveUrlState} once the transition has been made.
  *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 14:27)
  */
-public class PrefetchState implements State {
+public class PrefetchUrlState implements UrlState {
 
     private static final String DEFAULT_ADDRESS_PREFIX = "http://";
     private final String address;
@@ -42,7 +42,7 @@ public class PrefetchState implements State {
     private String username;
     private String password;
 
-    public PrefetchState(String address, Integer depth) throws MalformedURLException {
+    public PrefetchUrlState(String address, Integer depth) throws MalformedURLException {
         this.depth = depth;
         String url = address;
         if (!url.contains("://")) {
@@ -176,10 +176,6 @@ public class PrefetchState implements State {
     @Override
     public Long getTimestamp() {
         throw new UnsupportedOperationException();
-    }
-
-    public static void main(String[] args) {
-        System.out.println("ftp".matches("(?i:https?)"));
     }
 
 }

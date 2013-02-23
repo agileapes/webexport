@@ -18,7 +18,6 @@ package com.agileapes.webexport.net.impl;
 import com.agileapes.webexport.net.ProxyDescriptor;
 
 import java.net.Proxy;
-import java.net.URL;
 
 /**
  * This is an immutable proxy descriptor
@@ -51,11 +50,6 @@ public class ImmutableProxyDescriptor implements ProxyDescriptor {
     @Override
     public Integer getPort() {
         return port;
-    }
-
-    public static void main(String[] args) throws Exception {
-        final URL url = new URL("");
-
     }
 
 }
