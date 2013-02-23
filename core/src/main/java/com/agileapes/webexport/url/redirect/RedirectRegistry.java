@@ -16,11 +16,17 @@
 package com.agileapes.webexport.url.redirect;
 
 /**
+ * The registry for all redirects in the system.
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 16:31)
  */
 public interface RedirectRegistry {
 
+    /**
+     * Will add the specified redirect to the system registry
+     * @param redirect    the redirect to be added to the system
+     */
     void register(Redirect redirect);
 
 }

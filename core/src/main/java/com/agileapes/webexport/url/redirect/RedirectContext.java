@@ -18,11 +18,16 @@ package com.agileapes.webexport.url.redirect;
 import java.util.Set;
 
 /**
+ * The redirect context will hold all redirects register with the system
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 16:29)
  */
 public interface RedirectContext {
 
+    /**
+     * @return a set of redirects registered with the system
+     */
     Set<Redirect> getRedirects();
 
 }

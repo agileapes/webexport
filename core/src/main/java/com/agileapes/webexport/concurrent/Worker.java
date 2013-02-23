@@ -29,8 +29,16 @@ public abstract class Worker extends Thread {
         this.manager = manager;
     }
 
+    /**
+     * This method is called to reset the state of the worker thread so that
+     * it can be assigned a new task
+     */
     public abstract void initialize();
 
+    /**
+     * This method encapsulates the actual performing of the work by this worker
+     * It should be designed as a run-once method
+     */
     public abstract void perform();
 
     @SuppressWarnings("unchecked")
