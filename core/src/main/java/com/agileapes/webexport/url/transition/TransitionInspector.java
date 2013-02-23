@@ -15,10 +15,14 @@
 
 package com.agileapes.webexport.url.transition;
 
+import com.agileapes.webexport.concurrent.Manager;
+import com.agileapes.webexport.concurrent.Worker;
+import com.agileapes.webexport.parse.Parser;
+import com.agileapes.webexport.url.redirect.Redirect;
+import com.agileapes.webexport.url.redirect.RedirectContext;
 import com.agileapes.webexport.url.state.UrlState;
 
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -27,77 +31,55 @@ import java.util.Set;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/21, 18:12)
  */
-public class TransitionInspector extends Thread {
+public class TransitionInspector extends Worker {
 
-    private UrlState state;
-    private final TransitionManager manager;
+    private UrlState target;
+    private UrlState origin;
+    private UrlState start;
+    private RedirectContext redirectContext;
 
-    public TransitionInspector(TransitionManager manager) {
-        this.manager = manager;
+    protected TransitionInspector(Manager manager) {
+        super(manager);
+    }
+
+    public void setTargetState(UrlState target) {
+        this.target = target;
+    }
+
+    public void setOriginState(UrlState origin) {
+        this.origin = origin;
+    }
+
+    public void setStartState(UrlState start) {
+        this.start = start;
     }
 
     @Override
-    public void run() {
-        synchronized (this) {
-            while (true) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
+    public synchronized void initialize() {
+        start = null;
+        origin = null;
+        target = null;
+    }
+
+    @Override
+    public void perform() {
+        final Set<Redirect> redirects = redirectContext.getRedirects();
+        final Set<Parser> parsers = new HashSet<Parser>();
+        for (Redirect redirect : redirects) {
+            if (redirect.getRule().matches(start, origin, target)) {
+                final Parser parser = redirect.getParser();
+                //if a drop command has been issued in the matching rules,
+                //we will drop this transition no matter what
+                if (Parser.NULL.equals(parser)) {
                     return;
                 }
-                System.out.println("Executing ...");
-                try {
-                    wait(5000);
-                } catch (InterruptedException e) {
-                    return;
-                }
-                System.out.println("Done.");
-                manager.done(this);
+                parsers.add(parser);
             }
         }
+        //we now have to schedule parse actions and leave it at that
     }
 
-    public void setState(UrlState state) {
-        this.state = state;
+    public void setRedirectContext(RedirectContext redirectContext) {
+        this.redirectContext = redirectContext;
     }
-
-    private static interface Callback {
-
-        void execute(Worker worker);
-
-    }
-
-    private static final class Worker extends Thread {
-
-        private final long id;
-        private final Callback finish;
-
-        private Worker(long id, Callback finish) {
-            this.id = id;
-            this.finish = finish;
-        }
-
-        @Override
-        public void run() {
-            synchronized (this) {
-                while (true) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                    System.out.printf("[%d] Starting to work ...%n", id);
-                    try {
-                        wait(5000);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                    System.out.printf("[%d] Done.%n", id);
-                    finish.execute(this);
-                }
-            }
-        }
-
-    }
-
 }

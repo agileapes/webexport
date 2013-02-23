@@ -28,14 +28,13 @@ import com.agileapes.webexport.url.rule.Rule;
 public interface Redirect {
 
     /**
-     * @return the rule that should be applied at any given state
+     * @return the rule that should be applied at any given transition
      */
     Rule getRule();
 
     /**
-     * @param url    the URL to be examined
-     * @return the relevant parser, or {@code null} if none applies
+     * @return the relevant parser
      */
-    Parser resolve(String url);
+    Parser getParser();
 
 }

@@ -13,27 +13,16 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.redirect.impl;
+package com.agileapes.webexport.url.redirect;
 
-import com.agileapes.webexport.parse.Parser;
-import com.agileapes.webexport.url.rule.Rule;
+import java.util.Set;
 
 /**
- * A NullRedirect is a redirect that results in the url being dropped in case the
- * specified rule applies to the URL
- *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/12, 13:50)
+ * @since 1.0 (2013/2/23, 16:29)
  */
-public final class NullRedirect extends ImmutableRedirect {
+public interface RedirectContext {
 
-    public NullRedirect(Rule rule) {
-        super(rule);
-    }
-
-    @Override
-    public Parser getParser() {
-        return Parser.NULL;
-    }
+    Set<Redirect> getRedirects();
 
 }

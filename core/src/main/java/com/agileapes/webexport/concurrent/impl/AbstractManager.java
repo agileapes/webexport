@@ -16,6 +16,7 @@
 package com.agileapes.webexport.concurrent.impl;
 
 import com.agileapes.webexport.concurrent.Manager;
+import com.agileapes.webexport.concurrent.Worker;
 import com.agileapes.webexport.concurrent.WorkerPreparator;
 
 import java.util.Set;
@@ -30,11 +31,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 13:36)
  */
-public abstract class AbstractManager<R extends Thread> implements Manager<R> {
+public abstract class AbstractManager<W extends Worker> implements Manager<W> {
 
     private AtomicBoolean running = new AtomicBoolean(true);
-    private final Set<R> idle = new CopyOnWriteArraySet<R>();
-    private final Set<R> working = new CopyOnWriteArraySet<R>();
+    private final Set<W> idle = new CopyOnWriteArraySet<W>();
+    private final Set<W> working = new CopyOnWriteArraySet<W>();
 
     /**
      * This constructor will ensure that a given number of worker threads are
@@ -43,7 +44,7 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
      */
     protected AbstractManager(int workers) {
         for (int i = 0; i < workers; i ++) {
-            final R worker = initializeWorker();
+            final W worker = newWorker();
             idle.add(worker);
             worker.start();
         }
@@ -84,7 +85,7 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
                 }
             }
             //now all the threads must be idle
-            for (R worker : idle) {
+            for (W worker : idle) {
                 //we send an interrupt signal to each idle thread so that
                 //it will finish its business
                 worker.interrupt();
@@ -98,7 +99,7 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
     }
 
     @Override
-    public void done(R worker) {
+    public void done(W worker) {
         if (!working.contains(worker)) {
             throw new IllegalStateException();
         }
@@ -106,10 +107,24 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
         idle.add(worker);
     }
 
+    @Override
+    public void fail(W worker) {
+        done(worker);
+        handleFailure(worker);
+    }
+
+    /**
+     * This method is supposed to handle cases in which a worker failed to
+     * complete its task
+     * @param worker    the worker
+     */
+    protected void handleFailure(W worker) {
+    }
+
     /**
      * @return an initialized instance of the worker thread
      */
-    protected abstract R initializeWorker();
+    protected abstract W newWorker();
 
     /**
      * This will run the run-once pass over the tasks
@@ -120,7 +135,7 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
      * This method will start a task by preparing some worker and then notifying it
      * @param preparators    the preparators to prepare the worker and initialize the task
      */
-    protected void start(WorkerPreparator<R> ... preparators) {
+    protected void start(WorkerPreparator<W> ... preparators) {
         while (idle.isEmpty()) {
             //waiting for some worker to become available
             try {
@@ -133,14 +148,15 @@ public abstract class AbstractManager<R extends Thread> implements Manager<R> {
         }
         //this part is mainly concerned with assigning the task to the worker
         synchronized (this) {
-            final R worker = idle.iterator().next();
+            final W worker = idle.iterator().next();
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (worker) {
                 //we first mark the worker thread as in-use
                 idle.remove(worker);
                 working.add(worker);
                 //then we prepare the worker
-                for (WorkerPreparator<R> preparator : preparators) {
+                worker.initialize();
+                for (WorkerPreparator<W> preparator : preparators) {
                     preparator.prepare(worker);
                 }
                 //and finally we notify it that it should begin its processing

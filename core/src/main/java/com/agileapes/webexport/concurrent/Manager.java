@@ -23,7 +23,7 @@ package com.agileapes.webexport.concurrent;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 13:33)
  */
-public interface Manager<R extends Thread> extends Runnable {
+public interface Manager<W extends Worker> extends Runnable {
 
     /**
      * This method should be called whenever we expect this manager to shut itself and
@@ -36,6 +36,13 @@ public interface Manager<R extends Thread> extends Runnable {
      * the given worker has done its work and can now be assigned new tasks
      * @param worker    the worker
      */
-    void done(R worker);
+    void done(W worker);
+
+    /**
+     * Works just like {@link #done(Worker)} but signals that the assigned task was not
+     * successfully performed
+     * @param worker    the worker
+     */
+    void fail(W worker);
 
 }

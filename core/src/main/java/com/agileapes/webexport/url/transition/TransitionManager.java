@@ -22,7 +22,7 @@ public class TransitionManager extends AbstractManager<TransitionInspector> {
     }
 
     @Override
-    protected TransitionInspector initializeWorker() {
+    protected TransitionInspector newWorker() {
         return new TransitionInspector(this);
     }
 
@@ -39,7 +39,7 @@ public class TransitionManager extends AbstractManager<TransitionInspector> {
         start(new WorkerPreparator<TransitionInspector>() {
             @Override
             public void prepare(TransitionInspector worker) {
-                worker.setState(state);
+                worker.setTargetState(state);
             }
         });
     }

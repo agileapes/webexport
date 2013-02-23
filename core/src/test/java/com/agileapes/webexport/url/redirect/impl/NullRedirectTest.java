@@ -15,7 +15,7 @@ public class NullRedirectTest {
     @Test
     public void testNullRedirect() throws Exception {
         final Redirect redirect = new NullRedirect(Rule.ALL);
-        Parser parser = redirect.resolve("");
+        Parser parser = redirect.getParser();
         Assert.assertEquals(parser, Parser.NULL);
     }
 

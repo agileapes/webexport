@@ -23,12 +23,12 @@ package com.agileapes.webexport.concurrent;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 15:14)
  */
-public interface WorkerPreparator<R extends Thread> {
+public interface WorkerPreparator<W extends Worker> {
 
     /**
      * This method will be called once for each worker prior to its execution
      * @param worker    the worker thread
      */
-    void prepare(R worker);
+    void prepare(W worker);
 
 }
