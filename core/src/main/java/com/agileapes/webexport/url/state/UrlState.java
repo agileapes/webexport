@@ -121,4 +121,12 @@ public interface UrlState {
      */
     String getHeader(String header);
 
+    /**
+     * @return the parent state leading to this state
+     */
+    UrlState getParent();
+
+    String getDirectory();
+
+    String getFilename();
 }

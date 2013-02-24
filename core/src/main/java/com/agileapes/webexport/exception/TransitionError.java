@@ -13,27 +13,28 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.redirect.impl;
-
-import com.agileapes.webexport.parse.Parser;
-import com.agileapes.webexport.url.rule.Rule;
+package com.agileapes.webexport.exception;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/24, 20:15)
+ * @since 1.0 (2013/2/24, 17:06)
  */
-public class ImmutableRedirect extends AbstractRedirect {
+public class TransitionError extends Error {
 
-    private final Parser parser;
-
-    public ImmutableRedirect(Rule rule, Parser parser) {
-        super(rule);
-        this.parser = parser;
+    public TransitionError() {
+        super();
     }
 
-    @Override
-    public Parser getParser() {
-        return parser;
+    public TransitionError(String message) {
+        super(message);
+    }
+
+    public TransitionError(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public TransitionError(Throwable cause) {
+        super(cause);
     }
 
 }

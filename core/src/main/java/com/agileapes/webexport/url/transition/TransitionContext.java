@@ -13,19 +13,19 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.state;
+package com.agileapes.webexport.url.transition;
+
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
- * The UrlStateContext is the omniscient class in charge of the current state of affairs
- * regarding the state-machine model of the crawler
- *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/23, 13:49)
+ * @since 1.0 (2013/2/24, 19:29)
  */
-public interface UrlStateContext {
+public interface TransitionContext {
+
+    void add(UrlState target);
 
     UrlState next();
 
-    void add(UrlState state);
-
+    boolean isEmpty();
 }

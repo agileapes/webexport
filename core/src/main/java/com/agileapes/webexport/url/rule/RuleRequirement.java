@@ -15,6 +15,8 @@
 
 package com.agileapes.webexport.url.rule;
 
+import java.util.Collection;
+
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/12, 16:37)
@@ -25,14 +27,37 @@ public enum RuleRequirement {
      * the rule does not need any interaction with the server and can be evaluated
      * by only using the address of the target state
      */
-    ADDRESS,
+    ADDRESS(1),
     /**
      * the rule requires HTTP headers to be sent
      */
-    HEADERS,
+    HEADERS(2),
     /**
      * the rule requires the content to be fetched
      */
-    CONTENT
+    CONTENT(3);
+
+    private final int level;
+
+    private RuleRequirement(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public static RuleRequirement getRequirement(Collection<RuleRequirement> requirements) {
+        if (requirements == null || requirements.isEmpty()) {
+            return ADDRESS;
+        }
+        RuleRequirement requirement = ADDRESS;
+        for (RuleRequirement ruleRequirement : requirements) {
+            if (ruleRequirement.getLevel() > requirement.getLevel()) {
+                requirement = ruleRequirement;
+            }
+        }
+        return requirement;
+    }
 
 }

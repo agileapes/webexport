@@ -110,4 +110,43 @@ public class ActiveUrlState implements UrlState {
         return headers.get(header);
     }
 
+    @Override
+    public UrlState getParent() {
+        return state.getParent();
+    }
+
+    @Override
+    public String getDirectory() {
+        return state.getDirectory();
+    }
+
+    @Override
+    public String getFilename() {
+        return state.getFilename();
+    }
+
+    @Override
+    public String toString() {
+        return getAddress() + "[" + getTimestamp() + "]:" + getContent().substring(0, Math.min(50, getContent().length()));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof UrlState)) {
+            return false;
+        }
+        if (obj instanceof PrefetchUrlState && ((PrefetchUrlState) obj).getAddress().equals(getAddress())) {
+            return true;
+        }
+        if (obj instanceof ActiveUrlState) {
+            if (((ActiveUrlState) obj).getContent().equals(getContent())) {
+                return true;
+            }
+            if (((ActiveUrlState) obj).getAddress().equals(getAddress())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

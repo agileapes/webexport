@@ -45,4 +45,11 @@ public interface Manager<W extends Worker> extends Runnable {
      */
     void fail(W worker);
 
+    /**
+     * This will signal the manager that a worker was interrupted. It is up to the manager to
+     * decide whether this was intentional or by mistake
+     * @param worker    the worker that was interrupted
+     */
+    void interrupted(W worker);
+
 }

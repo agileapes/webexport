@@ -40,7 +40,7 @@ public interface Rule {
     public static final Rule ALL = new Rule() {
         @Override
         public boolean matches(UrlState start, UrlState origin, UrlState target) {
-            return false;
+            return true;
         }
 
         @Override

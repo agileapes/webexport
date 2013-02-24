@@ -13,27 +13,22 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.redirect.impl;
+package com.agileapes.webexport.parse.impl;
 
+import com.agileapes.webexport.model.PageModel;
+import com.agileapes.webexport.model.impl.DefaultPageModel;
 import com.agileapes.webexport.parse.Parser;
-import com.agileapes.webexport.url.rule.Rule;
+import com.agileapes.webexport.url.state.UrlState;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/24, 20:15)
+ * @since 1.0 (2013/2/24, 20:14)
  */
-public class ImmutableRedirect extends AbstractRedirect {
-
-    private final Parser parser;
-
-    public ImmutableRedirect(Rule rule, Parser parser) {
-        super(rule);
-        this.parser = parser;
-    }
+public class SimpleParser implements Parser {
 
     @Override
-    public Parser getParser() {
-        return parser;
+    public PageModel parse(UrlState state) {
+        return new DefaultPageModel(state);
     }
 
 }

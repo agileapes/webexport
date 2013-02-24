@@ -13,35 +13,30 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.state.impl;
+package com.agileapes.webexport.url.redirect.impl;
 
-import com.agileapes.webexport.url.state.UrlState;
-import com.agileapes.webexport.url.state.UrlStateContext;
-
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import com.agileapes.webexport.url.redirect.Redirect;
+import com.agileapes.webexport.url.rule.Rule;
 
 /**
+ * An AbstractRedirect is a redirect that has an immutable rule.
+ * The specification of the process leading to the selection of a
+ * {@link com.agileapes.webexport.parse.Parser} is left to the developer
+ *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/23, 15:27)
+ * @since 1.0 (2013/2/12, 13:51)
  */
-public class DefaultUrlStateContext implements UrlStateContext {
+public abstract class AbstractRedirect implements Redirect {
 
-    private final Set<UrlState> states = new CopyOnWriteArraySet<UrlState>();
+    private final Rule rule;
 
-    @Override
-    public synchronized UrlState next() {
-        if (states.isEmpty()) {
-            return null;
-        }
-        final UrlState state = states.iterator().next();
-        states.remove(state);
-        return state;
+    public AbstractRedirect(Rule rule) {
+        this.rule = rule;
     }
 
     @Override
-    public void add(UrlState state) {
-        states.add(state);
+    public Rule getRule() {
+        return rule;
     }
 
 }

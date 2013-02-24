@@ -13,27 +13,16 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.redirect.impl;
+package com.agileapes.webexport.net;
 
-import com.agileapes.webexport.parse.Parser;
-import com.agileapes.webexport.url.rule.Rule;
+import java.net.MalformedURLException;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/24, 20:15)
+ * @since 1.0 (2013/2/24, 17:20)
  */
-public class ImmutableRedirect extends AbstractRedirect {
+public interface PageDownloaderFactory {
 
-    private final Parser parser;
-
-    public ImmutableRedirect(Rule rule, Parser parser) {
-        super(rule);
-        this.parser = parser;
-    }
-
-    @Override
-    public Parser getParser() {
-        return parser;
-    }
+    PageDownloader getDownloader(String url) throws MalformedURLException;
 
 }

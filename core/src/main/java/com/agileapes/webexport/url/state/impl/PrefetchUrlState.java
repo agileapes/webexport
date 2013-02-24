@@ -21,6 +21,8 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A PrefetchUrlState is a preview of the state we will be in once we download the content of the page.
@@ -41,8 +43,12 @@ public class PrefetchUrlState implements UrlState {
     private Integer port;
     private String username;
     private String password;
+    private final UrlState parentState;
+    private String directory;
+    private String filename;
 
-    public PrefetchUrlState(String address, Integer depth) throws MalformedURLException {
+    public PrefetchUrlState(UrlState parentState, String address, Integer depth) throws MalformedURLException {
+        this.parentState = parentState;
         this.depth = depth;
         String url = address;
         if (!url.contains("://")) {
@@ -91,19 +97,31 @@ public class PrefetchUrlState implements UrlState {
         if (context.isEmpty()) {
             context = "/";
         }
+        if (context.length() > 1 && context.endsWith("/")) {
+            context = context.substring(0, context.length() - 1);
+        }
+        final Matcher matcher = Pattern.compile("^(/.*?)(?:/([^/]+))?$", Pattern.DOTALL).matcher(context);
+        matcher.find();
+        directory = matcher.group(1);
+        filename = matcher.group(2);
+        if (filename == null) {
+            filename = "";
+        }
+        if (filename.isEmpty() && directory.matches("/[^/]+")) {
+            filename = directory.substring(1);
+            directory = "/";
+        }
         if (i >= url.length()) {
             return;
         }
         i ++;
         final String[] queries = url.substring(i).split("&");
         for (String query : queries) {
-            final String[] split = query.split("=");
+            final String[] split = query.split("=", 2);
             if (split.length == 1) {
                 parameters.put(split[0], "");
             } else if (split.length == 2) {
                 parameters.put(split[0], split[1]);
-            } else {
-                throw new MalformedURLException("Malformed query key-value: " + query);
             }
         }
     }
@@ -174,8 +192,37 @@ public class PrefetchUrlState implements UrlState {
     }
 
     @Override
+    public UrlState getParent() {
+        return parentState;
+    }
+
+    @Override
     public Long getTimestamp() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public String toString() {
+        return getAddress();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof UrlState)) {
+            return false;
+        }
+        UrlState that = (UrlState) obj;
+        return this.address.equals(that.getAddress());
+    }
+
+
+    @Override
+    public String getDirectory() {
+        return directory;
+    }
+
+    @Override
+    public String getFilename() {
+        return filename;
+    }
 }

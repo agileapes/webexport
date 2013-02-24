@@ -18,6 +18,7 @@ package com.agileapes.webexport.concurrent.impl;
 import com.agileapes.webexport.concurrent.Manager;
 import com.agileapes.webexport.concurrent.Worker;
 import com.agileapes.webexport.concurrent.WorkerPreparator;
+import org.apache.log4j.Logger;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -36,15 +37,20 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
     private AtomicBoolean running = new AtomicBoolean(true);
     private final Set<W> idle = new CopyOnWriteArraySet<W>();
     private final Set<W> working = new CopyOnWriteArraySet<W>();
+    private final Set<W> interrupted = new CopyOnWriteArraySet<W>();
+    private final boolean autoShutdown;
+    public static final Logger logger = Logger.getLogger(Manager.class);
 
     /**
      * This constructor will ensure that a given number of worker threads are
      * initialized and are thus ready to be used
      * @param workers    maximum number of worker threads
+     * @param autoShutdown    whether an auto-shutdown should be considered
      */
-    protected AbstractManager(int workers) {
+    protected AbstractManager(int workers, boolean autoShutdown) {
+        this.autoShutdown = autoShutdown;
         for (int i = 0; i < workers; i ++) {
-            final W worker = newWorker();
+            final W worker = newWorker(i);
             idle.add(worker);
             worker.start();
         }
@@ -55,8 +61,21 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
         running = new AtomicBoolean(false);
     }
 
+    public void onStartup() {
+        logger.info("Starting up " + getClass().getSimpleName() + " ...");
+    }
+
+    public void onBeforeShutdown() {
+        logger.info("Going to shutdown " + getClass().getSimpleName() + " ...");
+    }
+
+    public void onAfterShutdown() {
+        logger.info("Shutdown for " + getClass().getSimpleName() + " completed.");
+    }
+
     @Override
     public void run() {
+        onStartup();
         try {
             synchronized (this) {
                 //we will continue with the execution as long as a shutdown
@@ -74,6 +93,7 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
                 }
             }
         } finally {
+            onBeforeShutdown();
             //after the execution, we will clean after ourselves.
             //this is essentially the shutdown part.
             while (!working.isEmpty()) {
@@ -88,6 +108,7 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
             for (W worker : idle) {
                 //we send an interrupt signal to each idle thread so that
                 //it will finish its business
+                interrupted.add(worker);
                 worker.interrupt();
                 try {
                     //we wait for the worker to acknowledge our interrupt signal
@@ -95,7 +116,13 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
                 } catch (InterruptedException ignored) {
                 }
             }
+            onAfterShutdown();
         }
+    }
+
+    private void markDone(W worker) {
+        working.remove(worker);
+        idle.add(worker);
     }
 
     @Override
@@ -103,14 +130,29 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
         if (!working.contains(worker)) {
             throw new IllegalStateException();
         }
-        working.remove(worker);
-        idle.add(worker);
+        markDone(worker);
+        if (autoShutdown && working.isEmpty() && done()) {
+            shutdown();
+        }
     }
 
     @Override
     public void fail(W worker) {
         done(worker);
         handleFailure(worker);
+    }
+
+    @Override
+    public void interrupted(W worker) {
+        if (interrupted.contains(worker)) {
+            markDone(worker);
+            return;
+        }
+        fail(worker);
+    }
+
+    protected boolean done() {
+        return true;
     }
 
     /**
@@ -122,9 +164,10 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
     }
 
     /**
+     * @param index     the index of the new worker
      * @return an initialized instance of the worker thread
      */
-    protected abstract W newWorker();
+    protected abstract W newWorker(int index);
 
     /**
      * This will run the run-once pass over the tasks

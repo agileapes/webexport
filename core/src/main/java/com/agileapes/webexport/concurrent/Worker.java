@@ -15,6 +15,9 @@
 
 package com.agileapes.webexport.concurrent;
 
+import org.apache.log4j.Logger;
+import org.springframework.util.StopWatch;
+
 /**
  * A worker is a thread that is responsible for performing a task
  *
@@ -24,9 +27,12 @@ package com.agileapes.webexport.concurrent;
 public abstract class Worker extends Thread {
 
     private final Manager manager;
+    private static final Logger logger = Logger.getLogger(Worker.class);
 
-    protected Worker(Manager manager) {
+    protected Worker(Manager manager, String name) {
+        super(name);
         this.manager = manager;
+        initialize();
     }
 
     /**
@@ -47,16 +53,24 @@ public abstract class Worker extends Thread {
         synchronized (this) {
             while (true) {
                 try {
+                    logger.info("Waiting for a task.");
                     wait();
                 } catch (InterruptedException e) {
-                    manager.fail(this);
+                    logger.warn(getName() + " was interrupted.");
+                    manager.interrupted(this);
                     return;
                 }
                 try {
+                    final StopWatch watch = new StopWatch();
+                    watch.start();
                     perform();
+                    watch.stop();
+                    logger.info("Action performed in " + watch.getTotalTimeMillis() + "ms");
                 } catch (Throwable e) {
+                    logger.error(e);
                     manager.fail(this);
                 }
+                logger.info(getName() + " is done.");
                 manager.done(this);
             }
         }
