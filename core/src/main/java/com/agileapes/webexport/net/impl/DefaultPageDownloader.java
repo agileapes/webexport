@@ -102,7 +102,10 @@ public class DefaultPageDownloader implements PageDownloader {
             cookieManager.storeCookies(urlConnection);
             while (urlConnection.getResponseCode() / 100 == 3) {
                 //we are being redirected
-                final String location = urlConnection.getHeaderField("Location");
+                String location = urlConnection.getHeaderField("Location");
+                if (!location.contains("://")) {
+                    location = (url.getProtocol() + "://" + url.getHost() + "/" + location).replaceAll("//+", "/");
+                }
                 urlConnection = (HttpURLConnection) new URL(location).openConnection(getProxy());
                 cookieManager.setCookies(urlConnection);
                 urlConnection.setInstanceFollowRedirects(false);

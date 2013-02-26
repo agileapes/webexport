@@ -33,7 +33,7 @@ public interface Manager<W extends Worker> extends Runnable {
 
     /**
      * This method is called by a worker within its bounds to signify that
-     * the given worker has done its work and can now be assigned new tasks
+     * the given worker has completed its work and can now be assigned new tasks
      * @param worker    the worker
      */
     void done(W worker);

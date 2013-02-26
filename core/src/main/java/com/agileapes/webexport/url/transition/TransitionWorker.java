@@ -15,24 +15,17 @@
 
 package com.agileapes.webexport.url.transition;
 
-import com.agileapes.webexport.concurrent.Worker;
+import com.agileapes.webexport.concurrent.impl.AbstractActionWorker;
 import com.agileapes.webexport.net.PageDownloader;
 import com.agileapes.webexport.net.PageDownloaderFactory;
-import com.agileapes.webexport.net.impl.AutomatedRobotsController;
-import com.agileapes.webexport.net.impl.DefaultPageDownloaderFactory;
 import com.agileapes.webexport.parse.Parser;
-import com.agileapes.webexport.parse.impl.SimpleParser;
 import com.agileapes.webexport.tools.CollectionDSL;
 import com.agileapes.webexport.url.redirect.Redirect;
 import com.agileapes.webexport.url.redirect.RedirectContext;
-import com.agileapes.webexport.url.redirect.impl.DefaultRedirectContext;
-import com.agileapes.webexport.url.redirect.impl.ImmutableRedirect;
-import com.agileapes.webexport.url.rule.Rule;
 import com.agileapes.webexport.url.rule.RuleRequirement;
 import com.agileapes.webexport.url.state.UrlState;
 import com.agileapes.webexport.url.state.impl.ActiveUrlState;
 import com.agileapes.webexport.url.state.impl.PrefetchUrlState;
-import com.agileapes.webexport.url.transition.impl.DefaultTransitionContext;
 import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -43,57 +36,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The transition inspector will inspect a given situation and decide on the next move
- *
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/21, 18:12)
+ * @since 1.0 (2013/2/26, 14:33)
  */
-public class TransitionInspector extends Worker {
+public class TransitionWorker extends AbstractActionWorker<TransitionAction> {
 
     private static final String MAIL_TO_PREFIX = "mailto:";
     private final TransitionManager manager;
     private UrlState target;
-    private UrlState origin;
     private UrlState start;
-    private PageDownloaderFactory downloaderFactory;
+    private UrlState origin;
     private RedirectContext redirectContext;
+    private PageDownloaderFactory downloaderFactory;
 
-    protected TransitionInspector(TransitionManager manager, String name) {
+    protected TransitionWorker(TransitionManager manager, String name) {
         super(manager, name);
         this.manager = manager;
     }
 
-    public void setTargetState(UrlState target) {
-        this.target = target;
-    }
-
-    public void setOriginState(UrlState origin) {
-        this.origin = origin;
-    }
-
-    public void setStartState(UrlState start) {
-        this.start = start;
-    }
-
-    public void setRedirectContext(RedirectContext redirectContext) {
-        this.redirectContext = redirectContext;
-    }
-
-    public void setDownloaderFactory(PageDownloaderFactory downloaderFactory) {
-        this.downloaderFactory = downloaderFactory;
-    }
-
     @Override
-    public synchronized void initialize() {
-        start = null;
-        origin = null;
-        target = null;
-        downloaderFactory = null;
+    public void setAction(TransitionAction action) {
+        super.setAction(action);
+        if (action == null) {
+            this.start = null;
+            this.origin = null;
+            this.target = null;
+            this.redirectContext = null;
+            this.downloaderFactory = null;
+            return;
+        }
+        this.start = action.getStart();
+        this.origin = action.getOrigin();
+        this.target = action.getTarget();
+        this.redirectContext = action.getRedirectContext();
+        this.downloaderFactory = action.getPageDownloaderFactory();
     }
 
     @Override
     public void perform() {
-        final Logger logger = Logger.getLogger("com.agileapes.webexport.workers." + getId());
+        final Logger logger = Logger.getLogger("com.agileapes.webexport.workers." + getName());
         PrefetchUrlState originalTarget = (PrefetchUrlState) target;
         logger.info("Evaluating: " + target);
         final Set<Redirect> redirects = redirectContext.getRedirects();
@@ -138,13 +119,13 @@ public class TransitionInspector extends Worker {
             logger.info("URL out of context: " + target.getAddress());
             return;
         }
-        //we exchange headers and open the connection if not already done.
+        //we exchange headers and open the connection if not already completed.
         if (RuleRequirement.HEADERS.getLevel() > requirement.getLevel()) {
             if (!exchangeHeaders(originalTarget, headers, downloader, logger)) {
                 return;
             }
         }
-        //we download the content (if not already done)
+        //we download the content (if not already completed)
         if (RuleRequirement.CONTENT.getLevel() > requirement.getLevel()) {
             if (!downloadContent(originalTarget, headers, downloader, logger)) {
                 return;
@@ -162,6 +143,12 @@ public class TransitionInspector extends Worker {
             if (link.startsWith(MAIL_TO_PREFIX)) {
                 continue;
             }
+            try {
+                link = manager.getAddressTransformer().transform(link);
+            } catch (MalformedURLException e) {
+                continue;
+            }
+            //stripping the hash tag
             if (link.contains("#")) {
                 link = link.substring(0, link.indexOf("#"));
             }
@@ -169,7 +156,7 @@ public class TransitionInspector extends Worker {
                 link =  target.getProtocol() + "://" + (target.getDomain() + "/" + target.getDirectory() + "/" + link).replaceAll("//+", "/");
             }
             try {
-                manager.getTransitionContext().add(new PrefetchUrlState(target, link, target.getDepth() + 1));
+                getScheduler().schedule(new TransitionAction(new PrefetchUrlState(target, link, target.getDepth() + 1), redirectContext, downloaderFactory));
             } catch (MalformedURLException ignored) {
                 logger.warn("Ignoring malformed URL: " + link);
             }
@@ -218,50 +205,16 @@ public class TransitionInspector extends Worker {
             downloader.download(writer);
             target = new ActiveUrlState(originalTarget, target.getTimestamp(), writer.toString(), headers);
         } catch (IllegalAccessError e) {
-            logger.error("Access denied to agent at " + originalTarget.getAddress());
+            logger.warn("Access denied to agent at " + originalTarget.getAddress());
             return false;
         } catch (FileNotFoundException e) {
-            logger.error("Error 404: " + originalTarget.getAddress());
+            logger.warn("Error 404: " + originalTarget.getAddress());
             return false;
         } catch (Throwable e) {
             logger.error("Failed to download content: " + originalTarget.getAddress(), e);
             return false;
         }
         return true;
-    }
-
-    public static void main(String[] args) throws Exception {
-        final TransitionManager manager = new TransitionManager(15);
-        manager.setDownloaderFactory(new DefaultPageDownloaderFactory(new AutomatedRobotsController(), null, null));
-        final DefaultRedirectContext redirectContext = new DefaultRedirectContext();
-        redirectContext.register(new ImmutableRedirect(new Rule() {
-            @Override
-            public boolean matches(UrlState start, UrlState origin, UrlState target) {
-                final String[] extensions = {"bz2", "gz", "zip", "rar", "tar", "pkz", "bz", "7z"};
-                if (!origin.getDomain().endsWith(target.getDomain())) {
-                    return false;
-                }
-                if (target.getDirectory().matches("/mirrors($|/.*)")) {
-                    return false;
-                }
-                for (String extension : extensions) {
-                    if (target.getFilename().toLowerCase().endsWith("." + extension)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            @Override
-            public RuleRequirement getRequirement() {
-                return RuleRequirement.ADDRESS;
-            }
-        }, new SimpleParser()));
-        manager.setRedirectContext(redirectContext);
-        final DefaultTransitionContext transitionContext = new DefaultTransitionContext();
-        transitionContext.add(new PrefetchUrlState(null, "http://www.kernel.org", 0));
-        manager.setTransitionContext(transitionContext);
-        new Thread(manager).start();
     }
 
 }

@@ -13,20 +13,14 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.io.impl.content;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+package com.agileapes.webexport.concurrent;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/13, 20:57)
+ * @since 1.0 (2013/2/26, 14:20)
  */
-public class FileContent extends BufferedContent {
+public interface ActionScheduler<A extends ActionDescriptor> {
 
-    public FileContent(File file) throws IOException {
-        super(new FileReader(file));
-    }
+    void schedule(A action);
 
 }

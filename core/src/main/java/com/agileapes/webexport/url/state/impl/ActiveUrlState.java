@@ -127,7 +127,7 @@ public class ActiveUrlState implements UrlState {
 
     @Override
     public String toString() {
-        return getAddress() + "[" + getTimestamp() + "]:" + getContent().substring(0, Math.min(50, getContent().length()));
+        return getAddress() + "[" + getTimestamp() + "]:" + getContent().substring(0, Math.min(50, getContent().length())).replaceAll("[\\n|\\r]", " ");
     }
 
     @Override

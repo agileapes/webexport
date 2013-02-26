@@ -13,20 +13,27 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.io.impl.content;
+package com.agileapes.webexport.url.transform.impl;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import com.agileapes.webexport.url.transform.AddressTransformer;
+
+import java.net.MalformedURLException;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/13, 20:57)
+ * @since 1.0 (2013/2/26, 21:48)
  */
-public class FileContent extends BufferedContent {
+public class AjaxContentTransformer implements AddressTransformer {
 
-    public FileContent(File file) throws IOException {
-        super(new FileReader(file));
+    private static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
+
+    @Override
+    public String transform(String url) throws MalformedURLException {
+        if (url.contains("#")) {
+            final String[] split = url.split("#", 2);
+            return split[0] + (split[0].contains("?") ? "&" : "?") + ESCAPED_FRAGMENT + split[1];
+        }
+        return url;
     }
 
 }

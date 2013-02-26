@@ -13,19 +13,32 @@
  * or substantial portions of the Software.
  */
 
-package com.agileapes.webexport.url.transition;
+package com.agileapes.webexport.url.transform.impl;
 
-import com.agileapes.webexport.url.state.UrlState;
+import com.agileapes.webexport.url.transform.AddressTransformer;
+
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
- * @since 1.0 (2013/2/24, 19:29)
+ * @since 1.0 (2013/2/26, 21:53)
  */
-public interface TransitionContext {
+public class SerialAddressTransformer implements AddressTransformer {
 
-    void add(UrlState target);
+    private List<AddressTransformer> transformers = new ArrayList<AddressTransformer>();
 
-    UrlState next();
+    public void add(AddressTransformer transformer) {
+        transformers.add(transformer);
+    }
 
-    boolean isEmpty();
+    @Override
+    public String transform(String url) throws MalformedURLException {
+        for (AddressTransformer transformer : transformers) {
+            url = transformer.transform(url);
+        }
+        return url;
+    }
+
 }

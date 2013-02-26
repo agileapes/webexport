@@ -31,6 +31,7 @@ public abstract class Worker extends Thread {
 
     protected Worker(Manager manager, String name) {
         super(name);
+        logger.info("Starting worker " + name);
         this.manager = manager;
         initialize();
     }

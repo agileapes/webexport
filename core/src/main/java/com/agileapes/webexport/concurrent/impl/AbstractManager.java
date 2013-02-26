@@ -19,6 +19,10 @@ import com.agileapes.webexport.concurrent.Manager;
 import com.agileapes.webexport.concurrent.Worker;
 import com.agileapes.webexport.concurrent.WorkerPreparator;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -32,23 +36,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Mohammad Milad Naseri (m.m.naseri@gmail.com)
  * @since 1.0 (2013/2/23, 13:36)
  */
-public abstract class AbstractManager<W extends Worker> implements Manager<W> {
+public abstract class AbstractManager<W extends Worker> implements Manager<W>, InitializingBean, ApplicationContextAware {
 
     private AtomicBoolean running = new AtomicBoolean(true);
     private final Set<W> idle = new CopyOnWriteArraySet<W>();
     private final Set<W> working = new CopyOnWriteArraySet<W>();
     private final Set<W> interrupted = new CopyOnWriteArraySet<W>();
-    private final boolean autoShutdown;
+    private boolean autoShutdown;
+    private int workers;
     public static final Logger logger = Logger.getLogger(Manager.class);
+    private ApplicationContext applicationContext;
 
-    /**
-     * This constructor will ensure that a given number of worker threads are
-     * initialized and are thus ready to be used
-     * @param workers    maximum number of worker threads
-     * @param autoShutdown    whether an auto-shutdown should be considered
-     */
-    protected AbstractManager(int workers, boolean autoShutdown) {
-        this.autoShutdown = autoShutdown;
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        logger.info("Initializing workers for " + getClass().getSimpleName());
         for (int i = 0; i < workers; i ++) {
             final W worker = newWorker(i);
             idle.add(worker);
@@ -131,7 +132,13 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
             throw new IllegalStateException();
         }
         markDone(worker);
-        if (autoShutdown && working.isEmpty() && done()) {
+        logger.info("Finished evaluating worker: " + worker.getName());
+        logger.debug("Auto shutdown is " + (autoShutdown ? "" : "not ") + "enabled");
+        if (isAutoShutdown()) {
+            logger.debug("Number of workers active: " + working.size());
+            logger.debug("Completion criteria check: " + completed());
+        }
+        if (isAutoShutdown() && working.isEmpty() && completed()) {
             shutdown();
         }
     }
@@ -151,7 +158,7 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
         fail(worker);
     }
 
-    protected boolean done() {
+    protected boolean completed() {
         return true;
     }
 
@@ -206,6 +213,23 @@ public abstract class AbstractManager<W extends Worker> implements Manager<W> {
                 worker.notify();
             }
         }
+    }
+
+    public void setWorkers(int workers) {
+        this.workers = workers;
+    }
+
+    public void setAutoShutdown(boolean autoShutdown) {
+        this.autoShutdown = autoShutdown;
+    }
+
+    public boolean isAutoShutdown() {
+        return autoShutdown;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
 }

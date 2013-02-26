@@ -20,7 +20,7 @@ import com.agileapes.webexport.model.PageModel;
 import java.util.Collection;
 
 /**
- * This event is fired when the application's work is done, and all the states have been
+ * This event is fired when the application's work is completed, and all the states have been
  * visited or decided to be irrelevant. In this case, the worker threads are all closed,
  * and the application is left with a pool of all the collected page meta data.
  *
