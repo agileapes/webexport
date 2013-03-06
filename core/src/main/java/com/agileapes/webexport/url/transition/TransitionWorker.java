@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 public class TransitionWorker extends AbstractActionWorker<TransitionAction> {
 
     private static final String MAIL_TO_PREFIX = "mailto:";
+    private static final String JAVASCRIPT_PREFIX = "javascript:";
     private final TransitionManager manager;
     private UrlState target;
     private UrlState start;
@@ -143,6 +144,9 @@ public class TransitionWorker extends AbstractActionWorker<TransitionAction> {
             if (link.startsWith(MAIL_TO_PREFIX)) {
                 continue;
             }
+            if (link.startsWith(JAVASCRIPT_PREFIX)) {
+                continue;
+            }
             try {
                 link = manager.getAddressTransformer().transform(link);
             } catch (MalformedURLException e) {
@@ -153,7 +157,11 @@ public class TransitionWorker extends AbstractActionWorker<TransitionAction> {
                 link = link.substring(0, link.indexOf("#"));
             }
             if (!link.contains("://")) {
-                link =  target.getProtocol() + "://" + (target.getDomain() + "/" + target.getDirectory() + "/" + link).replaceAll("//+", "/");
+                if (link.startsWith("/")) {
+                    link = target.getProtocol() + "://" + (target.getDomain() + link).replaceAll("//+", "/");
+                } else {
+                    link =  target.getProtocol() + "://" + (target.getDomain() + "/" + target.getDirectory() + "/" + link).replaceAll("//+", "/");
+                }
             }
             try {
                 getScheduler().schedule(new TransitionAction(new PrefetchUrlState(target, link, target.getDepth() + 1), redirectContext, downloaderFactory));

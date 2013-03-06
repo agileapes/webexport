@@ -53,43 +53,4 @@ public class TransitionManager extends AbstractActionManager<TransitionAction> {
         this.addressTransformer = addressTransformer;
     }
 
-    public static void main(String[] args) throws Exception {
-        final TransitionManager manager = new TransitionManager();
-        manager.setWorkers(15);
-        final DefaultPageDownloaderFactory downloaderFactory = new DefaultPageDownloaderFactory(new AutomatedRobotsController(), null, null);
-        final DefaultRedirectContext redirectContext = new DefaultRedirectContext();
-        redirectContext.register(new ImmutableRedirect(new Rule() {
-            @Override
-            public boolean matches(UrlState start, UrlState origin, UrlState target) {
-                final String[] extensions = {"bz2", "gz", "zip", "rar", "tar", "pkz", "bz", "7z"};
-                if (!start.getDomain().equals(target.getDomain())) {
-                    return false;
-                }
-                if (target.getContext().matches("/mirrors($|/.*)")) {
-                    return false;
-                }
-                for (String extension : extensions) {
-                    if (target.getFilename().toLowerCase().endsWith("." + extension)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            @Override
-            public RuleRequirement getRequirement() {
-                return RuleRequirement.ADDRESS;
-            }
-        }, new SimpleParser()));
-        final DefaultActionQueue<TransitionAction> queue = new DefaultActionQueue<TransitionAction>("transitionQueue");
-        queue.schedule(new TransitionAction(new PrefetchUrlState(null, "http://www.kernel.org", 0), redirectContext, downloaderFactory));
-        manager.setQueue(queue);
-        manager.setAutoShutdown(true);
-        final SerialAddressTransformer addressTransformer = new SerialAddressTransformer();
-        addressTransformer.add(new AjaxContentTransformer());
-        addressTransformer.add(new SessionAddressTransformer());
-        manager.setAddressTransformer(addressTransformer);
-        manager.afterPropertiesSet();
-        new Thread(manager).start();
-    }
 }
